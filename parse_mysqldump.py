@@ -13,12 +13,23 @@ CATEGORYLINKS_PARSER=re.compile(r'^(?P<row0>[0-9]+?),(?P<row1>\'.*?\'?),(?P<row2
 PAGELINKS_PARSER=re.compile(r'^(?P<row0>[0-9]+?),(?P<row1>[0-9]+?),(?P<row2>\'.*?\'?),(?P<row3>[0-9]+?)$')
 REDIRECT_PARSER=re.compile(r'^(?P<row0>[0-9]+?),(?P<row1>-?[0-9]+?),(?P<row2>\'.*?\'?),(?P<row3>\'.*?\'?),(?P<row4>\'.*?\'?)$')
 CATEGORY_PARSER=re.compile(r'^(?P<row0>[0-9]+?),(?P<row1>\'.*?\'?),(?P<row2>[0-9]+?),(?P<row3>[0-9]+?),(?P<row4>[0-9]+?)$')
-PAGE_PROPS_PARSER=re.compile(r'^([0-9]+),(\'.*?\'),(\'.*?\'),(\'[0-9\ \-:]+\'),(\'\'),(\'.*?\'),(\'.*?\')$')
+TEMPLATELINKS_PARSER = re.compile(r'^(?P<row0>[0-9]+),(?P<row1>-?[0-9]+),(?P<row2>\'.*?\'),(?P<row3>[0-9]+)$')
+PAGE_PROPS_PARSER=re.compile(r'^(?P<row0>[0-9]+),(?P<row1>\'.*?\'),(?P<row2>\'.*?\'),(?P<row3>[0-9]+|NULL)$')
 PAGE_PARSER=re.compile((r'^(?P<row0>[0-9]+?),(?P<row1>[0-9]+?),(?P<row2>\'.*?\'?),(?P<row3>\'.*?\'?),(?P<row4>[0-9]+?),(?P<row5>[0-9]+?),(?P<row6>[0-9]?),'
     r'(?P<row7>[0-9\.]+?),(?P<row8>\'.*?\'?),(?P<row9>(?P<row9val>\'.*?\'?)|(?P<row9null>NULL)),(?P<row10>[0-9]+?),(?P<row11>[0-9]+?),'
     r'(?P<row12>(?P<row12val>\'.*?\'?)|(?P<row12null>NULL)),(?P<row13>(?P<row13val>\'.*?\'?)|(?P<row13null>NULL))$'))
 
 """
+#
+CREATE TABLE `page_props` (
+  `pp_page` int(11) NOT NULL DEFAULT '0',
+  `pp_propname` varbinary(60) NOT NULL DEFAULT '',
+  `pp_value` blob NOT NULL,
+  `pp_sortkey` float DEFAULT NULL,
+  PRIMARY KEY (`pp_page`,`pp_propname`),
+  UNIQUE KEY `pp_propname_page` (`pp_propname`,`pp_page`),
+  UNIQUE KEY `pp_propname_sortkey_page` (`pp_propname`,`pp_sortkey`,`pp_page`)
+
 # page
 `page_id` int(8) unsigned NOT NULL AUTO_INCREMENT,
 `page_namespace` int(11) NOT NULL DEFAULT '0',
@@ -42,6 +53,15 @@ PAGE_PARSER=re.compile((r'^(?P<row0>[0-9]+?),(?P<row1>[0-9]+?),(?P<row2>\'.*?\'?
 `pl_title` varbinary(255) NOT NULL DEFAULT '',
 `pl_from_namespace` int(11) NOT NULL DEFAULT '0',
 
+# template links 
++-------------------+------------------+------+-----+---------+-------+
+| Field             | Type             | Null | Key | Default | Extra |
++-------------------+------------------+------+-----+---------+-------+
+| tl_from           | int(10) unsigned | NO   | PRI | 0       |       |
+| tl_namespace      | int(11)          | NO   | PRI | 0       |       |
+| tl_title          | varbinary(255)   | NO   | PRI |         |       |
+| tl_from_namespace | int(11)          | NO   | MUL | 0       |       |
++-------------------+------------------+------+-----+---------+-------+
 
 """
 
@@ -51,8 +71,9 @@ FILETYPE_PROPS=dict(
         pagelinks=FILEPROPS(PAGELINKS_PARSER, 4, (0, 1, 2, 3)),
         redirect=FILEPROPS(REDIRECT_PARSER, 5, (0, 1, 2)),
         category=FILEPROPS(CATEGORY_PARSER, 5, (0, 1, 2, 3, 4)),
-        page_props=FILEPROPS(PAGE_PROPS_PARSER, 7, (0, 1)),
+        page_props=FILEPROPS(PAGE_PROPS_PARSER, 4, (0, 1, 2, 3)),
         page=FILEPROPS(PAGE_PARSER, 14, (0, 1, 2, 5, 11, 12, 13)),
+        templatelinks=FILEPROPS(TEMPLATELINKS_PARSER, 4, (0,1,2,3)),
         )
 
 #VALUE_PARSER=re.compile(r'\(([0-9]+),(\'.*?\'),(\'.*?\'),(\'[0-9\ \-:]+\'),(\'\'),(\'.*?\'),(\'.*?\')\)')
