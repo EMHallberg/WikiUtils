@@ -1,5 +1,5 @@
 # WikiUtils
-A set of utility scripts to process Wikipedia related data
+A set of utility scripts to process Wikipedia related data, forked from @napsternxg
 
 
 ## parse\_mysqldump
@@ -13,7 +13,7 @@ usage: parse_mysqldump.py [-h] [--column-indexes COLUMN_INDEXES]
 positional arguments:
   filename              name of the wikipedia sql.gz file.
   filetype              following filetypes are supported: [categorylinks,
-                        pagelinks, redirect, category, page_props, page]
+                        pagelinks, redirect, category, page_props, page, templatelinks]
   outputfile            name of the output file
 
 optional arguments:
@@ -23,10 +23,6 @@ optional arguments:
 ```
 
 
-## Inspecting dump files in BASH
+## Information about the dumpfiles available from Wikimedia
 
-Run the following command to parse the dump files in bash. The first and last lines will have some non column information. 
-
-```
-zcat enwiki-20170920-categorylinks.sql.gz | grep $'^INSERT INTO ' | sed 's/),(/\n/g' | less -N
-```
+Can be found here https://www.mediawiki.org/wiki/Manual:Database_layout 
